@@ -42,7 +42,7 @@ public class Core {
                 photoURI.add(Uri.parse(allPicsCursor.getString(4)));
             }
         }
-        return null;
+        return photoURI;
     }
 
     public static boolean inTime(long photoTimestamp, long eventStart, long eventEnd){

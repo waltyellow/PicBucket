@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The timeline fragment
@@ -133,7 +134,8 @@ public class TimelineFragment extends Fragment {
     private ArrayList<EventInfo> nonEmptyEvents(ArrayList<EventInfo> originalList){
         ArrayList<EventInfo> output = new ArrayList<>();
         for(EventInfo unfiltered: originalList){
-            unfiltered.estimatedCount = Core.listOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
+            unfiltered.photoList = Core.listOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
+            unfiltered.estimatedCount = unfiltered.photoList.size();
             if (unfiltered.estimatedCount > 0){
                 output.add(unfiltered);
             }
@@ -185,6 +187,7 @@ public class TimelineFragment extends Fragment {
         Long endTime;
         int estimatedCount = 0;
         String location ="";
+        List<Uri> photoList;
 
         public EventInfo(Cursor cursor){
             eventID = cursor.getString(0);
