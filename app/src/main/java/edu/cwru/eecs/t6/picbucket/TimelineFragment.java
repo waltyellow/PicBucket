@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * The timeline fragment
@@ -118,7 +117,6 @@ public class TimelineFragment extends Fragment {
                 arguments.putString(SelectedEventFragment.EVENT_TITLE,split[0]);
                 arguments.putString(SelectedEventFragment.EVENT_ID,clickedEventInfo.eventID);
                 arguments.putString(SelectedEventFragment.LOCATION, clickedEventInfo.location);
-                selectedEvent.eventInfo = clickedEventInfo;
                 selectedEvent.setArguments(arguments);
 
                 FragmentTransaction transaction = getActivity().getFragmentManager().beginTransaction();
@@ -135,8 +133,7 @@ public class TimelineFragment extends Fragment {
     private ArrayList<EventInfo> nonEmptyEvents(ArrayList<EventInfo> originalList){
         ArrayList<EventInfo> output = new ArrayList<>();
         for(EventInfo unfiltered: originalList){
-            unfiltered.photoList = Core.listOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
-            unfiltered.estimatedCount = unfiltered.photoList.size();
+            unfiltered.estimatedCount = Core.listOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
             if (unfiltered.estimatedCount > 0){
                 output.add(unfiltered);
             }
@@ -188,7 +185,6 @@ public class TimelineFragment extends Fragment {
         Long endTime;
         int estimatedCount = 0;
         String location ="";
-        List<Uri> photoList;
 
         public EventInfo(Cursor cursor){
             eventID = cursor.getString(0);
@@ -208,17 +204,17 @@ public class TimelineFragment extends Fragment {
                 }
             }
             split = eventString.split("\n");
+            Date startTime2 = null;
+            Date endTime2 = null;
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
-                Date startTime = sdf.parse(split[1]);
-                Date endTime = sdf.parse(split[2]);
-                System.out.println(startTime.getTime());
-                System.out.println(endTime.getTime());
+                startTime2 = sdf.parse(split[1]);
+                endTime2 = sdf.parse(split[2]);
             }catch(Exception e){
                 e.printStackTrace();
             }
-            startTime = Long.parseLong(split[1]);
-            endTime = Long.parseLong(split[2]);
+            startTime = startTime2.getTime();
+            endTime = endTime2.getTime();
         }
 
         @Override

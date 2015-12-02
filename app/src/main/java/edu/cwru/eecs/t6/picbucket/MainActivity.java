@@ -10,10 +10,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Core.activity = this;
+
         setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
-
+        Core.activity = this;
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
         if (findViewById(R.id.fragment_container) != null) {
@@ -31,6 +31,7 @@ public class MainActivity extends Activity {
             getFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, timelineFragment).commit();
         }
+        Core.scanPhotos();
     }
 
 
