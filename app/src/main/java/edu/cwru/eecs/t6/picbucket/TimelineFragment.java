@@ -1,6 +1,7 @@
 package edu.cwru.eecs.t6.picbucket;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -34,10 +35,10 @@ public class TimelineFragment extends Fragment {
     static final int REQUEST_TAKE_PHOTO = 1;
 
     // This is the Adapter being used to display the list's data
-    public ArrayAdapter<String> mAdapter;
+    public ArrayAdapter<EventInfo> mAdapter;
 
     // ArrayList of Strings of each Event information
-    private ArrayList<String> mEventInfo = new ArrayList<String>();
+    private ArrayList<EventInfo> mEventInfo = new ArrayList<EventInfo>();
 
     // These are the Events rows that we will retrieve
     static final String[] PROJECTION = new String[] {
@@ -72,44 +73,22 @@ public class TimelineFragment extends Fragment {
         });
 
         // String to store in TextView for an Event
-        String eventInfo = "";
+        String eventString = "";
         // Cursor with data from Content Provider query
         Cursor cursor =  getActivity().getContentResolver().query(CalendarContract.Events.CONTENT_URI, PROJECTION, SELECTION, null, null);
         // Combining the query data into a single String to put in a TextView
+        EventInfo eventInfo;
         if(cursor.moveToFirst()){
-            for(int i = 1; i < 5; i++){
-                // Chane the date/time format
-                if(i == 2 || i == 3){
-                    eventInfo = eventInfo + getDate(cursor.getLong(i));
-                }
-                else {
-                    eventInfo = eventInfo + cursor.getString(i);
-                }
-                if(i != 4) {
-                    eventInfo = eventInfo + "\n";
-                }
-            }
+            eventInfo = new EventInfo(cursor);
             mEventInfo.add(eventInfo);
-            eventInfo = "";
             while(cursor.moveToNext()){
-                for(int i = 1; i < 5; i++){
-                    if(i == 2 || i == 3){
-                        eventInfo = eventInfo + getDate(cursor.getLong(i));
-                    }
-                    else {
-                        eventInfo = eventInfo + cursor.getString(i);
-                    }
-                    if(i != 4) {
-                        eventInfo = eventInfo + "\n";
-                    }
-                }
+                eventInfo = new EventInfo(cursor);
                 mEventInfo.add(eventInfo);
-                eventInfo = "";
             }
         }
 
         // Set objects into ListView
-        mAdapter = new ArrayAdapter<String>(getActivity().getBaseContext(), android.R.layout.simple_list_item_1, mEventInfo);
+        mAdapter = new ArrayAdapter<EventInfo>(getActivity().getBaseContext(), android.R.layout.simple_list_item_1, mEventInfo);
         ListView timeline = (ListView) timelineView.findViewById(R.id.timeline);
         timeline.setAdapter(mAdapter);
 
@@ -128,6 +107,20 @@ public class TimelineFragment extends Fragment {
                 }catch(Exception e){
                     e.printStackTrace();
                 }
+                SelectedEventFragment selectedEvent = new SelectedEventFragment();
+                Bundle arguments = new Bundle();
+                arguments.putString(SelectedEventFragment.START_TIME,split[1]);
+                arguments.putString(SelectedEventFragment.END_TIME,split[2]);
+                arguments.putString(SelectedEventFragment.EVENT_TITLE,split[0]);
+                arguments.putString(SelectedEventFragment.EVENT_ID,((EventInfo)parent.getItemAtPosition(position)).eventID);
+                arguments.putString(SelectedEventFragment.LOCATION, "Default");
+                selectedEvent.setArguments(arguments);
+
+                FragmentTransaction transaction = getActivity().getFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, selectedEvent);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
             }
         });
 
@@ -168,5 +161,31 @@ public class TimelineFragment extends Fragment {
         String imageFileName = timeStamp + ".jpg";
         File photo = new File(Environment.getExternalStorageDirectory(),  imageFileName);
         return photo;
+    }
+
+    public class EventInfo {
+        String eventString = "";
+        String eventID;
+
+        public EventInfo(Cursor cursor){
+            eventID = cursor.getString(0);
+            for(int i = 1; i < 5; i++){
+                // Chane the date/time format
+                if(i == 2 || i == 3){
+                    eventString = eventString + getDate(cursor.getLong(i));
+                }
+                else {
+                    eventString = eventString + cursor.getString(i);
+                }
+                if(i != 4) {
+                    eventString = eventString + "\n";
+                }
+            }
+        }
+
+        @Override
+        public String toString() {
+            return eventString;
+        }
     }
 }

@@ -20,6 +20,7 @@ public class SelectedEventFragment extends Fragment {
     Button editEvent;
     String eventIDString;
     String eventLocation;
+    Bundle argument;
 
     static final String START_TIME = "start";
     static final String END_TIME = "end";
@@ -30,7 +31,7 @@ public class SelectedEventFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View eventView = inflater.inflate(R.layout.fragment_timeline, container, false);
+        View eventView = inflater.inflate(R.layout.fragment_event, container, false);
         startTimeView = (TextView)eventView.findViewById(R.id.startTime);
         endTimeView = (TextView)eventView.findViewById(R.id.endTime);
         eventTitle = (TextView)eventView.findViewById(R.id.eventTitle);
@@ -41,21 +42,24 @@ public class SelectedEventFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 long eventID = Long.parseLong(eventIDString);
+                //System.out.println(eventID);
                 Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
-                Intent intent = new Intent(Intent.ACTION_EDIT)
+                Intent intent = new Intent(Intent.ACTION_VIEW)
                         .setData(uri);
+                System.out.println(uri);
                 startActivity(intent);
             }
         });
 
-        return eventView;
-    }
-
-    public void setArgument(Bundle argument){
         startTimeView.setText((String)argument.get(START_TIME));
         endTimeView.setText((String)argument.get(END_TIME));
         eventTitle.setText((String)argument.get(EVENT_TITLE));
         eventIDString = ((String)argument.get(EVENT_ID));
         eventLocation = ((String)argument.get(LOCATION));
+        return eventView;
+    }
+
+    public void setArguments(Bundle argument){
+        this.argument = argument;
     }
 }
