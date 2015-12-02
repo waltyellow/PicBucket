@@ -21,12 +21,14 @@ public class SelectedEventFragment extends Fragment {
     String eventIDString;
     String eventLocation;
     Bundle argument;
+    TimelineFragment.EventInfo eventInfo;
 
     static final String START_TIME = "start";
     static final String END_TIME = "end";
     static final String EVENT_TITLE = "title";
     static final String EVENT_ID = "id";
     static final String LOCATION = "location";
+    static final String EVENTINFO = "eventInfo";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
