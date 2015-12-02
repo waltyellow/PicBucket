@@ -27,7 +27,11 @@ public class Core {
             MediaStore.Images.Media.LATITUDE,
             MediaStore.Images.Media.DATA
     };
-    final static Cursor allPicsCursor = MediaStore.Images.Media.query(activity.getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI,projection);
+    static Cursor allPicsCursor;// = MediaStore.Images.Media.query(activity.getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI,projection);
+
+    public static void scanPhotos(){
+        allPicsCursor = MediaStore.Images.Media.query(activity.getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI,projection);
+    }
 
     public static List<Uri> listOfPhotos(long eventStart, long eventEnd, String location){
         ArrayList<Uri> photoURI = new ArrayList<Uri>();
