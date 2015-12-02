@@ -3,7 +3,9 @@ package edu.cwru.eecs.t6.picbucket;
 import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.CalendarContract;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -15,6 +17,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +31,7 @@ public class TimelineFragment extends Fragment {
 
     Button cameraButton;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
 
     // This is the Adapter being used to display the list's data
     public ArrayAdapter<String> mAdapter;
@@ -131,8 +136,22 @@ public class TimelineFragment extends Fragment {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                ex.printStackTrace();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
         }
     }
 
@@ -142,5 +161,12 @@ public class TimelineFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = timeStamp + ".jpg";
+        File photo = new File(Environment.getExternalStorageDirectory(),  imageFileName);
+        return photo;
     }
 }
