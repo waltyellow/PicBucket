@@ -87,6 +87,8 @@ public class TimelineFragment extends Fragment {
             }
         }
 
+        mEventInfo = nonEmptyEvents(mEventInfo);
+
         // Set objects into ListView
         mAdapter = new ArrayAdapter<EventInfo>(getActivity().getBaseContext(), android.R.layout.simple_list_item_1, mEventInfo);
         ListView timeline = (ListView) timelineView.findViewById(R.id.timeline);
@@ -109,11 +111,12 @@ public class TimelineFragment extends Fragment {
                 }
                 SelectedEventFragment selectedEvent = new SelectedEventFragment();
                 Bundle arguments = new Bundle();
+                EventInfo clickedEventInfo = ((EventInfo)parent.getItemAtPosition(position));
                 arguments.putString(SelectedEventFragment.START_TIME,split[1]);
                 arguments.putString(SelectedEventFragment.END_TIME,split[2]);
                 arguments.putString(SelectedEventFragment.EVENT_TITLE,split[0]);
-                arguments.putString(SelectedEventFragment.EVENT_ID,((EventInfo)parent.getItemAtPosition(position)).eventID);
-                arguments.putString(SelectedEventFragment.LOCATION, "Default");
+                arguments.putString(SelectedEventFragment.EVENT_ID,clickedEventInfo.eventID);
+                arguments.putString(SelectedEventFragment.LOCATION, clickedEventInfo.location);
                 selectedEvent.setArguments(arguments);
 
                 FragmentTransaction transaction = getActivity().getFragmentManager().beginTransaction();
@@ -125,6 +128,17 @@ public class TimelineFragment extends Fragment {
         });
 
         return timelineView;
+    }
+
+    private ArrayList<EventInfo> nonEmptyEvents(ArrayList<EventInfo> originalList){
+        ArrayList<EventInfo> output = new ArrayList<>();
+        for(EventInfo unfiltered: originalList){
+            unfiltered.estimatedCount = Core.numberOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
+            if (unfiltered.estimatedCount > 0){
+                output.add(unfiltered);
+            }
+        }
+        return output;
     }
 
     private void dispatchTakePictureIntent() {
@@ -164,8 +178,13 @@ public class TimelineFragment extends Fragment {
     }
 
     public class EventInfo {
+        String[] split;
         String eventString = "";
         String eventID;
+        Long startTime;
+        Long endTime;
+        int estimatedCount = 0;
+        String location ="";
 
         public EventInfo(Cursor cursor){
             eventID = cursor.getString(0);
@@ -177,15 +196,30 @@ public class TimelineFragment extends Fragment {
                 else {
                     eventString = eventString + cursor.getString(i);
                 }
+                if (i == 4){
+                    location = cursor.getString(i);
+                }
                 if(i != 4) {
                     eventString = eventString + "\n";
                 }
             }
+            split = eventString.split("\n");
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
+                Date startTime = sdf.parse(split[1]);
+                Date endTime = sdf.parse(split[2]);
+                System.out.println(startTime.getTime());
+                System.out.println(endTime.getTime());
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            startTime = Long.parseLong(split[1]);
+            endTime = Long.parseLong(split[2]);
         }
 
         @Override
         public String toString() {
-            return eventString;
+            return eventString + "\n(Estimated Photos:" + estimatedCount +")";
         }
     }
 }
