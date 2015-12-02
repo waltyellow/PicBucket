@@ -32,6 +32,8 @@ import java.util.List;
 public class TimelineFragment extends Fragment {
 
     Button cameraButton;
+    Button createNewEvent;
+    boolean initialized = false;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -72,7 +74,17 @@ public class TimelineFragment extends Fragment {
                 dispatchTakePictureIntent();
             }
         });
+        createNewEvent = (Button) (timelineView.findViewById(R.id.newevent));
 
+        createNewEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+                i.setAction(Intent.ACTION_EDIT);
+                i.setData(Uri.parse("content://com.android.calendar/events"));
+                startActivity(i);
+            }
+        });
         // String to store in TextView for an Event
         String eventString = "";
         // Cursor with data from Content Provider query
@@ -118,6 +130,7 @@ public class TimelineFragment extends Fragment {
                 arguments.putString(SelectedEventFragment.EVENT_TITLE,split[0]);
                 arguments.putString(SelectedEventFragment.EVENT_ID,clickedEventInfo.eventID);
                 arguments.putString(SelectedEventFragment.LOCATION, clickedEventInfo.location);
+                selectedEvent.eventInfo = clickedEventInfo;
                 selectedEvent.setArguments(arguments);
 
                 FragmentTransaction transaction = getActivity().getFragmentManager().beginTransaction();
@@ -128,6 +141,14 @@ public class TimelineFragment extends Fragment {
             }
         });
 
+        if (!initialized){
+            initialized = true;
+        }else{
+            FragmentTransaction transaction = getActivity().getFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, new TimelineFragment());
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
         return timelineView;
     }
 
@@ -136,14 +157,11 @@ public class TimelineFragment extends Fragment {
         for(EventInfo unfiltered: originalList){
             unfiltered.photoList = Core.listOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
             unfiltered.estimatedCount = unfiltered.photoList.size();
-            if (unfiltered.estimatedCount >= 0){
+            if (unfiltered.estimatedCount > 0){
                 output.add(unfiltered);
-                for (Uri uri:  unfiltered.photoList){
-                    System.out.println(uri+"--Detected");
-                }
             }
         }
-        return originalList;
+        return output;
     }
 
     private void dispatchTakePictureIntent() {

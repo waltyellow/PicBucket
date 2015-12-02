@@ -34,7 +34,7 @@ public class Core {
     }
 
     public static List<Uri> listOfPhotos(long eventStart, long eventEnd, String location){
-        ArrayList<Uri> photoURI = new ArrayList<Uri>();
+        ArrayList<Uri> photoURI = new ArrayList<>();
 
         for (int i = 0; i < allPicsCursor.getCount(); i++) {
             allPicsCursor.moveToPosition(i);

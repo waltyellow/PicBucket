@@ -29,9 +29,9 @@ public class MainActivity extends Activity {
             getFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, timelineFragment).commit();
         }
-        System.out.println("scanning started");
+        //System.out.println("scanning started");
         Core.scanPhotos();
-        System.out.println("scanning over");
+        //System.out.println("scanning over");
 
     }
 
