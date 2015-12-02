@@ -136,11 +136,14 @@ public class TimelineFragment extends Fragment {
         for(EventInfo unfiltered: originalList){
             unfiltered.photoList = Core.listOfPhotos(unfiltered.startTime, unfiltered.endTime, unfiltered.location);
             unfiltered.estimatedCount = unfiltered.photoList.size();
-            if (unfiltered.estimatedCount > 0){
+            if (unfiltered.estimatedCount >= 0){
                 output.add(unfiltered);
+                for (Uri uri:  unfiltered.photoList){
+                    System.out.println(uri+"--Detected");
+                }
             }
         }
-        return output;
+        return originalList;
     }
 
     private void dispatchTakePictureIntent() {

@@ -38,8 +38,9 @@ public class Core {
 
         for (int i = 0; i < allPicsCursor.getCount(); i++) {
             allPicsCursor.moveToPosition(i);
-            if(inTime(allPicsCursor.getLong(1), eventStart, eventEnd) && inLocation(location, allPicsCursor.getDouble(3), allPicsCursor.getDouble(2))){
+            if(inTime(allPicsCursor.getLong(1), eventStart, eventEnd)){ //&& inLocation(location, allPicsCursor.getDouble(3), allPicsCursor.getDouble(2))){
                 photoURI.add(Uri.parse(allPicsCursor.getString(4)));
+                //System.out.println("Searching"+allPicsCursor.getString(0));
             }
         }
         return photoURI;
